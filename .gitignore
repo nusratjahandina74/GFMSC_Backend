@@ -1,0 +1,65 @@
+# ==========================================
+# Environment Configuration & Security (Crucial for Multi-tenancy)
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+config/jwt/*.key
+config/jwt/*.pem
+config/tenant_configs/secrets.*
+
+# ==========================================
+# Application Uploads & Media (School Photos, Reports)
+# ==========================================
+# Tenant-specific file uploads should never be pushed to Git
+public/uploads/
+public/storage/
+storage/app/public/
+storage/tenants/
+uploads/tenants/
+media/
+
+# ==========================================
+# Logs and Databases
+# ==========================================
+*.log
+logs/
+*.sqlite
+*.sqlite3
+
+# ==========================================
+# Dependency Directories
+# ==========================================
+node_modules/
+bower_components/
+vendor/
+.pnp/
+.pnp.js
+
+# ==========================================
+# Build & Compiled Files (Frontend & Backend)
+# ==========================================
+dist/
+build/
+.next/
+.nuxt/
+out/
+.docusaurus/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==========================================
+# IDE & System Files
+# ==========================================
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.DS_Store
+Thumbs.db
