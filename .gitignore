@@ -2,7 +2,7 @@
 # Environment Configuration & Security (Crucial for Multi-tenancy)
 # ==========================================
 .env
-.env.local
+.env.example
 .env.*.local
 *.env
 config/jwt/*.key
