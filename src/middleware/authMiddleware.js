@@ -1,0 +1,29 @@
+import jwt from "jsonwebtoken";
+import { env } from "../config/env.js";
+const authMiddleware = (req, res, next) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+      return res.status(401).json({
+        success: false,
+        message: "No token provided",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, env.JWT_SECRET);
+
+    req.user = decoded;
+    req.schoolId = decoded.schoolId;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      message: "Unauthorized",
+    });
+  }
+};
+export default authMiddleware;
