@@ -7,9 +7,17 @@ import {
     updateAttendanceController,
     deleteAttendanceController,
 } from "../controllers/attendanceController.js";
+import {
+    createAttendanceSessionController,
+    deleteAttendanceSessionController,
+    getAttendanceSessionByIdController,
+    getAttendanceSessionsController,
+    updateAttendanceSessionController,
+} from "../controllers/attendanceSessionController.js";
 import authMiddleware from "../../../middleware/authMiddleware.js";
 import tenantMiddleware from "../../../middleware/tenantMiddleware.js";
 import roleMiddleware from "../../../middleware/roleMiddleware.js";
+
 const router = express.Router();
 /*
 |--------------------------------------------------------------------------
@@ -40,6 +48,65 @@ router.post("/bulk",authMiddleware,tenantMiddleware,roleMiddleware(
         "Teacher"
     ),
     bulkMarkAttendanceController
+);
+
+router.post(
+    "/sessions",
+    authMiddleware,
+    tenantMiddleware,
+    roleMiddleware(
+        "SuperAdmin",
+        "SchoolAdmin",
+        "Teacher"
+    ),
+    createAttendanceSessionController
+);
+
+router.get(
+    "/sessions",
+    authMiddleware,
+    tenantMiddleware,
+    roleMiddleware(
+        "SuperAdmin",
+        "SchoolAdmin",
+        "Teacher"
+    ),
+    getAttendanceSessionsController
+);
+
+router.get(
+    "/sessions/:id",
+    authMiddleware,
+    tenantMiddleware,
+    roleMiddleware(
+        "SuperAdmin",
+        "SchoolAdmin",
+        "Teacher"
+    ),
+    getAttendanceSessionByIdController
+);
+
+router.patch(
+    "/sessions/:id",
+    authMiddleware,
+    tenantMiddleware,
+    roleMiddleware(
+        "SuperAdmin",
+        "SchoolAdmin",
+        "Teacher"
+    ),
+    updateAttendanceSessionController
+);
+
+router.delete(
+    "/sessions/:id",
+    authMiddleware,
+    tenantMiddleware,
+    roleMiddleware(
+        "SuperAdmin",
+        "SchoolAdmin"
+    ),
+    deleteAttendanceSessionController
 );
 /*
 |--------------------------------------------------------------------------

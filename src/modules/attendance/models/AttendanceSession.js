@@ -63,6 +63,19 @@ const attendanceSessionSchema =
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
       },
+      isDeleted: {
+        type: Boolean,
+        default: false,
+      },
+      deletedAt: {
+        type: Date,
+        default: null,
+      },
+      deletedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: null,
+      },
     },
     {
       timestamps: true,
@@ -77,17 +90,20 @@ const attendanceSessionSchema =
 */
 
 attendanceSessionSchema.index({
+  schoolId: 1,
+  attendanceDate: 1,
+  classId: 1,
+  sectionId: 1,
+  status: 1,
+});
 
-    schoolId:1,
-
-    attendanceDate:1,
-
-    classId:1,
-
-    sectionId:1,
-
-    status:1,
-
+attendanceSessionSchema.index({
+  schoolId: 1,
+  academicSessionId: 1,
+  classId: 1,
+  sectionId: 1,
+  teacherId: 1,
+  attendanceDate: 1,
 });
 
 const AttendanceSession = mongoose.model(

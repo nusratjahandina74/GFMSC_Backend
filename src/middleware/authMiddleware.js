@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { env } from "../config/env.js";
+
 const authMiddleware = (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -15,7 +16,10 @@ const authMiddleware = (req, res, next) => {
 
     const decoded = jwt.verify(token, env.JWT_SECRET);
 
-    req.user = decoded;
+    req.user = {
+      ...decoded,
+      _id: decoded.id,
+    };
     req.schoolId = decoded.schoolId;
 
     next();

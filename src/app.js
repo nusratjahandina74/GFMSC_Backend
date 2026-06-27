@@ -25,32 +25,53 @@ import migrationLogRoutes from "./modules/migrationLogs/routes/migrationLogRoute
 import dashboardRoutes from "./modules/dashboard/routes/dashboardRoutes.js";
 import { errorMiddleware } from "./middleware/errorMiddleware.js";
 import attendanceRoutes from "./modules/attendance/routes/attendanceRoutes.js";
+
 const app = express();
+
 app.use(express.json());
 app.use(helmet());
 app.use(cors());
 app.use(morgan("dev"));
-app.use(errorMiddleware);
+
 app.use("/api/v1/auth", authRoutes);
 
 app.use("/api/v1/students", studentRoutes);
-app.use("/api/v1/guardians",guardianRoutes);
+app.use("/api/v1/guardians", guardianRoutes);
 app.use("/api/v1", classRoutes);
 app.use("/api/v1/classes", classRoutes);
 app.use("/api/v1/subjects", subjectRoutes);
 
 app.use("/api/v1/sections", sectionRoutes);
 
-app.use("/api/v1/teacher-assignments",teacherAssignmentRoutes);
-app.use("/api/v1/academic-sessions",academicSessionRoutes);
-app.use("/api/v1/student-academic-history",studentAcademicHistoryRoutes);
-app.use("/api/v1/promotions",promotionRoutes);
-app.use("/api/v1/transfers",transferRoutes);
+app.use(
+  "/api/v1/teacher-assignments",
+  teacherAssignmentRoutes
+);
+app.use(
+  "/api/v1/academic-sessions",
+  academicSessionRoutes
+);
+app.use(
+  "/api/v1/student-academic-history",
+  studentAcademicHistoryRoutes
+);
+app.use("/api/v1/promotions", promotionRoutes);
+app.use("/api/v1/transfers", transferRoutes);
 app.use("/api/v1/tc", tcRoutes);
 app.use("/api/v1/audit", auditRoutes);
 app.use("/api/v1/migration-logs", migrationRoutes);
 app.use("/api/v1/alumni", alumniRoutes);
 app.use("/api/v1/migration-logs", migrationLogRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
-app.use("/api/v1/attendance",  attendanceRoutes)
+app.use("/api/v1/attendance", attendanceRoutes);
+
+app.use((req, res) => {
+  return res.status(404).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+
+app.use(errorMiddleware);
+
 export default app;

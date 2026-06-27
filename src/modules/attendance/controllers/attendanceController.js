@@ -25,17 +25,13 @@ export const markAttendanceController = asyncHandler(async (req, res) => {
         );
         return res.status(201).json(result);
 });
-export const bulkMarkAttendanceController = asyncHandler(async (req, res) => {
-    const payload = attendanceBulkCreateSchema.parse(req.body);
-    const attendanceList = payload.map((item) => ({
-        ...item,
-        schoolId: req.schoolId,
-    }));
+export const bulkMarkAttendanceController = asyncHandler(async(req,res)=>{
+    const payload = bulkAttendanceSchema.parse(req.body);
+    const attendanceList = payload.attendances.map(item=>({...item, schoolId:req.schoolId}));
     const result = await bulkMarkAttendance(
-        attendanceList,
-        req.user._id
+        attendanceList, req.user._id
     );
-        return res.status(201).json(result);
+    return res.status(201).json(result);
 });
 export const getAttendanceController = asyncHandler(async (req, res) => {
     const query = attendanceQuerySchema.parse({
