@@ -3,9 +3,14 @@ export const create = async (data,session) => {
 const attendance = await Attendance.create([data],{session,});
 return attendance[0];
 };
-export const bulkCreateAttendance = async (payload,options = {}) => {
-return Attendance.insertMany(payload,{ordered: false,...options,});
-};
+export const bulkCreateAttendance=(payload,options={})=>{
+return Attendance.insertMany(payload,
+{
+ordered:false,
+session:options.session,
+}
+);
+}
 export const findAttendance = (filter,projection = {},options = {}) => {
 return Attendance.findOne(filter,projection,options);
 };

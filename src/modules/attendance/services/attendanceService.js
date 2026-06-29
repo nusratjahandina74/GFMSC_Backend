@@ -17,11 +17,11 @@ import {
 
 import AuditLog
     from "../../audit/models/AuditLog.js";
-const validateAttendanceSession = async (attendanceSessionId,schoolId,session = null) => {
+const validateAttendanceSession = async (attendanceSessionId, schoolId, session = null) => {
     const attendanceSession = await AttendanceSession.findOne({
-    _id:attendanceSessionId,
-    schoolId,
-}).session(session);
+        _id: attendanceSessionId,
+        schoolId,
+    }).session(session);
     if (!attendanceSession) {
         throw new Error(
             "Attendance session not found."
@@ -60,73 +60,40 @@ const createAuditLog = async ({
         }
     );
 };
-export const markAttendance = async (attendanceData,userId) => {
+export const markAttendance = async (attendanceData, userId) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
         attendanceData.attendanceDate =
-            normalizeAttendanceDate(
-                attendanceData.attendanceDate
-            );
+            normalizeAttendanceDate(attendanceData.attendanceDate);
         await validateAttendanceSession(
             attendanceData.attendanceSessionId,
             attendanceData.schoolId,
             session
         );
-        const duplicate = await attendanceRepository.findDuplicateAttendance(
-            {
-                schoolId:
-                attendanceData.schoolId,
-                studentId:
-                attendanceData.studentId,
-                attendanceDate:
-                attendanceData.attendanceDate,
-            },
-                session
-            );
-            await session.endSession();
-        if (duplicate) {
-            throw new Error(
-                "Attendance already marked."
-            );
-        }
-        const attendance = await attendanceRepository.create(
+        const duplicate =
+            await attendanceRepository.findDuplicateAttendance(
                 {
-                    ...attendanceData,
-                    markedBy: userId,
-                    status:
-                    attendanceData.status ??
-                    ATTENDANCE_STATUS.PRESENT,
+                    schoolId: attendanceData.schoolId,
+                    studentId: attendanceData.studentId,
+                    attendanceDate: attendanceData.attendanceDate,
                 },
                 session
             );
-        await createAuditLog({
-            schoolId: attendance.schoolId,
-            userId,
-            attendanceId: attendance._id,
-            action: "ATTENDANCE_MARKED",
-            newData: attendance,
-            session,
-        });
+        if (duplicate) {
+            throw new Error("Attendance already marked.");
+        }
         await session.commitTransaction();
-        return {
-            success: true,
-            message:
-                "Attendance marked successfully.",
-            data: attendance,
-        };
-    }
-    catch (error) {
+        return result;
+    } catch (error) {
         await session.abortTransaction();
         throw error;
+    } finally {
+        await session.endSession();
     }
-    finally {
-        session.endSession();
-    }
-
 };
-export const bulkMarkAttendance = async (attendanceList,userId) => {
-    const session =await mongoose.startSession();
+export const bulkMarkAttendance = async (attendanceList, userId) => {
+    const session = await mongoose.startSession();
     session.startTransaction();
     try {
         const payload = [];
@@ -146,18 +113,19 @@ export const bulkMarkAttendance = async (attendanceList,userId) => {
                     attendanceDate: item.attendanceDate,
                 },
                 session
-                );
+            );
             if (duplicate) {
                 continue;
             }
-            payload.push({...item,markedBy: userId, status:
-                item.status ??
-                ATTENDANCE_STATUS.PRESENT,
+            payload.push({
+                ...item, markedBy: userId, status:
+                    item.status ??
+                    ATTENDANCE_STATUS.PRESENT,
             });
         }
         if (!payload.length) {
             throw new Error(
-            "All attendance records already exist."
+                "All attendance records already exist."
             );
         }
         const attendances = await attendanceRepository.bulkCreateAttendance(
@@ -166,8 +134,9 @@ export const bulkMarkAttendance = async (attendanceList,userId) => {
                 session,
             }
         );
-        await createAuditLog({schoolId:
-            payload[0].schoolId,
+        await createAuditLog({
+            schoolId:
+                payload[0].schoolId,
             userId,
             attendanceId: null,
             action:
@@ -200,8 +169,8 @@ export const bulkMarkAttendance = async (attendanceList,userId) => {
 export const getAttendance = async (query) => {
     const filter =
         buildAttendanceFilter(query);
-    const {page,limit,} = buildPagination(query);
-    const [records,total,] = await Promise.all([
+    const { page, limit, } = buildPagination(query);
+    const [records, total,] = await Promise.all([
         attendanceRepository.findAttendances(filter,
             {
                 page,
@@ -247,7 +216,7 @@ export const getAttendanceById = async (id) => {
         data: attendance,
     };
 };
-export const updateAttendance = async (attendanceId,payload,userId) => {
+export const updateAttendance = async (attendanceId, payload, userId) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
@@ -278,11 +247,11 @@ export const updateAttendance = async (attendanceId,payload,userId) => {
             {
                 _id: attendanceId,
             },
-                payload,
+            payload,
             {
                 session,
             }
-            );
+        );
         await createAuditLog({
             schoolId: attendance.schoolId,
             userId,
@@ -308,16 +277,16 @@ export const updateAttendance = async (attendanceId,payload,userId) => {
         await session.endSession();
     }
 };
-export const deleteAttendance = async (attendanceId,userId) => {
+export const deleteAttendance = async (attendanceId, userId) => {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
-       const attendance = await attendanceRepository.findAttendance(
+        const attendance = await attendanceRepository.findAttendance(
             {
                 _id: attendanceId,
                 isDeleted: false,
             }
-            );
+        );
         if (!attendance) {
             throw new Error(
                 "Attendance not found."
@@ -357,5 +326,5 @@ export const deleteAttendance = async (attendanceId,userId) => {
         await session.abortTransaction();
         throw error;
     }
-    finally {await session.endSession();}
+    finally { await session.endSession(); }
 };
